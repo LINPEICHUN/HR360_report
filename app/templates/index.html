@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="360 度回饋分析與自動化報告生成系統 - HRBP 專用工具">
+    <title>360° Feedback Report Generator</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <!-- 載入遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">報告生成中，請稍候...</div>
+        <ul class="loading-steps" id="loadingSteps">
+            <li data-step="parse">📄 解析上傳檔案</li>
+            <li data-step="calc">🔢 計算分數與統計</li>
+            <li data-step="ai">🤖 AI 分析質性回饋</li>
+            <li data-step="render">📊 生成報告頁面</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <!-- 標題 -->
+        <header class="header">
+            <span class="header__icon">📊</span>
+            <h1 class="header__title">360° Feedback<br>Report Generator</h1>
+            <p class="header__subtitle">一鍵將問卷資料轉換為專業 360 度回饋報告</p>
+        </header>
+
+        <!-- 錯誤提示 -->
+        {% if error %}
+        <div class="error-banner" id="errorBanner">
+            <span>⚠️</span>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <!-- 表單 -->
+        <form id="reportForm" action="/api/generate-report" method="POST" enctype="multipart/form-data">
+
+            <!-- AI 設定卡片 -->
+            <div class="card">
+                <div class="card__title">
+                    <span class="card__title-icon">🤖</span>
+                    AI 分析設定
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="apiProvider">API 提供者</label>
+                    <select class="form-select" id="apiProvider" name="api_provider">
+                        {% for provider in api_providers %}
+                        <option value="{{ provider.value }}">{{ provider.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="apiKey">API Key</label>
+                    <div class="api-key-wrapper">
+                        <input class="form-input" type="password" id="apiKey" name="api_key"
+                               placeholder="輸入您的 API Key（選填，用於 AI 分析）">
+                        <button type="button" class="api-key-toggle" id="apiKeyToggle" title="顯示/隱藏">👁</button>
+                    </div>
+                    <div class="form-hint">未提供 API Key 將跳過 AI 質性分析</div>
+                </div>
+            </div>
+
+            <!-- 受評者資訊卡片 -->
+            <div class="card">
+                <div class="card__title">
+                    <span class="card__title-icon">👤</span>
+                    受評者資訊
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subjectName">受評者姓名</label>
+                    <input class="form-input" type="text" id="subjectName" name="name"
+                           placeholder="例如：王大明" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="grade">職級 (Grade)</label>
+                        <select class="form-select" id="grade" name="grade" required>
+                            {% for g in grades %}
+                            <option value="{{ g }}">{{ g }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="purpose">管理目的</label>
+                        <select class="form-select" id="purpose" name="purpose" required>
+                            {% for p in purposes %}
+                            <option value="{{ p.value }}">{{ p.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 檔案上傳卡片 -->
+            <div class="card">
+                <div class="card__title">
+                    <span class="card__title-icon">📁</span>
+                    資料匯入
+                </div>
+                <div class="upload-zone" id="uploadZone">
+                    <span class="upload-zone__icon">📤</span>
+                    <div class="upload-zone__text">拖曳檔案至此處，或點擊選擇檔案</div>
+                    <div class="upload-zone__hint">支援 .xlsx 或 .csv 格式（Google 表單匯出）</div>
+                    <div class="upload-zone__file-info" id="fileInfo">
+                        <span id="fileName"></span>
+                        <button type="button" class="upload-zone__remove" id="removeFile" title="移除檔案">✕</button>
+                    </div>
+                </div>
+                <input type="file" class="file-input-hidden" id="fileInput" name="file"
+                       accept=".xlsx,.xls,.csv" required>
+            </div>
+
+            <!-- 提交按鈕 -->
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                <span class="submit-btn__text">
+                    📊 產生 360 Feedback 報告
+                </span>
+            </button>
+
+        </form>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

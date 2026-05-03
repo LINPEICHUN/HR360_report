@@ -1,0 +1,21 @@
+[project]
+name = "hr-360-report"
+version = "1.0.0"
+description = "360 度回饋分析與自動化報告生成系統"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.0",
+    "python-multipart>=0.0.9",
+    "jinja2>=3.1.0",
+    "httpx>=0.27.0",
+    "google-genai>=1.0.0",
+    "openai>=1.50.0",
+    "markdown>=3.10.2",
+]
+
+[project.scripts]
+start = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"

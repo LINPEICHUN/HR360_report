@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Degree Feedback Report — {{ report.name }}</title>
+    <link rel="stylesheet" href="/static/css/report.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- 工具列（列印時隱藏） -->
+    <div class="report-toolbar">
+        <div class="report-toolbar__title">360° Feedback Report — {{ report.name }}</div>
+        <div class="report-toolbar__actions">
+            <button class="toolbar-btn toolbar-btn--secondary" onclick="window.location.href='/'">
+                ← 返回首頁
+            </button>
+            <button class="toolbar-btn toolbar-btn--primary" onclick="window.print()">
+                🖨️ 列印 / 另存 PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="report-body">
+        <div class="report-container">
+
+            <!-- ==========================================
+                 第一頁：封面
+                 ========================================== -->
+            <div class="report-page cover-page">
+                <div class="cover-content">
+                    <div class="cover-badge">CONFIDENTIAL</div>
+                    <h1 class="cover-title">360 Degree Feedback</h1>
+                    <p class="cover-title-sub">Report</p>
+                    <div class="cover-divider"></div>
+                    <div class="cover-info">
+                        <div class="cover-info-item">
+                            <span class="cover-info-label">受評者</span>
+                            <span class="cover-info-value">{{ report.name }}</span>
+                        </div>
+                        <div class="cover-info-item">
+                            <span class="cover-info-label">職級</span>
+                            <span class="cover-info-value">{{ report.grade }}</span>
+                        </div>
+                        <div class="cover-info-item">
+                            <span class="cover-info-label">管理目的</span>
+                            <span class="cover-info-value">{{ report.purpose }}</span>
+                        </div>
+                    </div>
+                    <p class="cover-description">
+                        360 度回饋是藉由匿名問卷的方式，向受評者在工作上最密切的合作對象收取關於該受評者的回饋，
+                        這些對象包含自己及其部屬（若該受評者為主管）、同儕和主管。
+                        360 度回饋讓受評者能收到來自各個角度的回饋，受評者從自我檢視及別人對自己的看法中，
+                        深入地認識自己，最終目的是發現自己的盲點，做為個人發展的依據。
+                    </p>
+                </div>
+                <div class="cover-date">{{ report.generated_at }}</div>
+            </div>
+
+            <!-- ==========================================
+                 第二頁：雷達圖 + 評分量表
+                 ========================================== -->
+            <div class="report-page">
+                <div class="page-header">
+                    <span class="page-header__title">Feedback Report for {{ report.name }}</span>
+                    <span class="page-header__page">Page 1</span>
+                </div>
+
+                <h2 class="section-title">Spider Diagram</h2>
+                <p class="section-subtitle">
+                    Summaries graphically your self perception and compares it with the feedback you received.
+                </p>
+
+                <!-- 雷達圖 -->
+                <div class="radar-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <!-- 圖例 -->
+                <div class="radar-legend">
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--self"></div>
+                        <span>Self (自評)</span>
+                    </div>
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--others"></div>
+                        <span>Others (他評平均)</span>
+                    </div>
+                </div>
+
+                <!-- 評分量表 -->
+                <table class="rating-scale-table">
+                    <thead>
+                        <tr>
+                            <th>Rating Scale</th>
+                            <th colspan="6">評分等級說明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for r in rating_scale %}
+                            <td><strong>{{ r.score }}</strong></td>
+                            {% endfor %}
+                            <td><strong>N/A</strong></td>
+                        </tr>
+                        <tr>
+                            {% for r in rating_scale %}
+                            <td>{{ r.label_zh }}<br><small>({{ r.label_en }})</small></td>
+                            {% endfor %}
+                            <td>沒有機會觀察<br><small>(N/A)</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ==========================================
+                 第三至十一頁：面向細項
+                 ========================================== -->
+            {% set page_num = [2] %}
+            {% for dim in report.dimensions %}
+            <div class="report-page">
+                <div class="page-header">
+                    <span class="page-header__title">Feedback Report for {{ report.name }}</span>
+                    <span class="page-header__page">Page {{ page_num[0] }}</span>
+                </div>
+                {% if page_num.append(page_num.pop() + 1) %}{% endif %}
+
+                <!-- 面向標題 -->
+                {% if dim.dimension == "帶領團隊" %}
+                <div class="dimension-header dimension-header--leading">
+                {% elif dim.dimension == "發展個人" %}
+                <div class="dimension-header dimension-header--developing">
+                {% else %}
+                <div class="dimension-header dimension-header--accomplishing">
+                {% endif %}
+                    <div class="dimension-header__title">
+                        In Detail: {{ dim.dimension }} {{ dim.dimension_en }}
+                    </div>
+                    <div class="dimension-header__subtitle">
+                        {% if dim.dimension == "帶領團隊" %}
+                        帶領並發展團隊成員以實現組織目標 Leading and developing team members to achieve organizational goals
+                        {% elif dim.dimension == "發展個人" %}
+                        持續提升個人能力並協助團隊成員發展 Continuously improving personal capabilities and developing team members
+                        {% else %}
+                        有效規劃與執行任務以達成績效目標 Effectively planning and executing tasks to achieve performance goals
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 面向摘要 -->
+                <div class="dimension-summary-bar">
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--self" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        自評平均: <strong>{{ "%.2f"|format(dim.self_average) if dim.self_average is not none else "N/A" }}</strong>
+                    </div>
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--others" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        他評平均: <strong>{{ "%.2f"|format(dim.others_average) if dim.others_average is not none else "N/A" }}</strong>
+                    </div>
+                </div>
+
+                <!-- In Summary -->
+                <h3 style="font-size:0.9rem;color:#6c757d;margin-bottom:16px;font-weight:500;">In Summary</h3>
+
+                <!-- 逐題卡片 -->
+                {% for q in dim.questions %}
+                <div class="question-card">
+                    <div class="question-card__title">{{ q.question_full }}</div>
+                    <div class="question-card__title-en">({{ q.question_en }})</div>
+                    <div class="question-scores">
+                        <div class="score-item">
+                            <span class="score-dot score-dot--self"></span>
+                            <span class="score-label">Own Answer:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.self_score) if q.self_score is not none else "N/A" }}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-dot score-dot--others"></span>
+                            <span class="score-label">Average Feedback:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.others_average) if q.others_average is not none else "N/A" }}</span>
+                        </div>
+                    </div>
+                    <div class="individual-scores">
+                        <strong>Individual Scores: </strong>
+                        {% for s in q.individual_scores %}{{ "%.0f"|format(s) if s is not none else "N/A" }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <p class="anonymity-note">Individual responses presented in a random order to preserve anonymity.</p>
+            </div>
+            {% endfor %}
+
+            <!-- ==========================================
+                 質性回饋頁
+                 ========================================== -->
+            <div class="report-page">
+                <div class="page-header">
+                    <span class="page-header__title">Feedback Report for {{ report.name }}</span>
+                    <span class="page-header__page">Page {{ page_num[0] }}</span>
+                </div>
+                {% if page_num.append(page_num.pop() + 1) %}{% endif %}
+
+                <h2 class="section-title">Free Type Questions</h2>
+                <p class="section-subtitle">
+                    You and your respondents had the opportunity to give qualitative answers to questions.
+                    Their responses are presented here together with your own answers.
+                </p>
+
+                {% for qf in report.qualitative %}
+                <div class="qualitative-dim-block">
+                    <div class="qualitative-dim-label">
+                        {% if qf.dimension == "帶領團隊" %}
+                        <span class="qualitative-dim-dot" style="background:var(--dim-leading)"></span>
+                        {% elif qf.dimension == "發展個人" %}
+                        <span class="qualitative-dim-dot" style="background:var(--dim-developing)"></span>
+                        {% else %}
+                        <span class="qualitative-dim-dot" style="background:var(--dim-accomplishing)"></span>
+                        {% endif %}
+                        {{ qf.dimension }}
+                    </div>
+
+                    <!-- 做得好 -->
+                    <div class="feedback-subsection">
+                        <div class="feedback-subsection__label">✨ 做得最好的地方</div>
+                        {% if qf.positive_self %}
+                        <div class="feedback-self">
+                            <strong>You answered:</strong> {{ qf.positive_self }}
+                        </div>
+                        {% endif %}
+                        {% if qf.positive_others %}
+                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
+                        <ul class="feedback-others-list">
+                            {% for fb in qf.positive_others %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- 建議改善 -->
+                    <div class="feedback-subsection">
+                        <div class="feedback-subsection__label">💡 建議可以如何調整</div>
+                        {% if qf.improve_self %}
+                        <div class="feedback-self">
+                            <strong>You answered:</strong> {{ qf.improve_self }}
+                        </div>
+                        {% endif %}
+                        {% if qf.improve_others %}
+                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
+                        <ul class="feedback-others-list">
+                            {% for fb in qf.improve_others %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- 其他回饋 -->
+                {% if report.other_feedback_self or report.other_feedback_others %}
+                <div class="qualitative-dim-block">
+                    <div class="qualitative-dim-label">
+                        <span class="qualitative-dim-dot" style="background:#8e44ad"></span>
+                        其他回饋與建議
+                    </div>
+                    {% if report.other_feedback_self %}
+                    <div class="feedback-self">
+                        <strong>You answered:</strong> {{ report.other_feedback_self }}
+                    </div>
+                    {% endif %}
+                    {% if report.other_feedback_others %}
+                    <ul class="feedback-others-list">
+                        {% for fb in report.other_feedback_others %}
+                        <li>{{ fb }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- 繼續共事意願 -->
+                {% if report.collaboration_average is not none %}
+                <div class="qualitative-dim-block" style="margin-top:20px;">
+                    <div class="qualitative-dim-label">
+                        <span class="qualitative-dim-dot" style="background:#2980b9"></span>
+                        繼續共事意願 (1-10 分)
+                    </div>
+                    <div class="question-scores" style="margin-top:8px;">
+                        <div class="score-item">
+                            <span class="score-dot score-dot--self"></span>
+                            <span class="score-label">Self:</span>
+                            <span class="score-value">{{ report.collaboration_self if report.collaboration_self is not none else "N/A" }}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-dot score-dot--others"></span>
+                            <span class="score-label">Others Avg:</span>
+                            <span class="score-value">{{ "%.1f"|format(report.collaboration_average) }}</span>
+                        </div>
+                    </div>
+                    <div class="individual-scores" style="margin-top:8px;">
+                        <strong>Individual: </strong>
+                        {% for s in report.collaboration_others %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ==========================================
+                 LLM 分析頁
+                 ========================================== -->
+            {% if report.llm_analysis %}
+            <div class="report-page">
+                <div class="page-header">
+                    <span class="page-header__title">Feedback Report for {{ report.name }}</span>
+                    <span class="page-header__page">Page {{ page_num[0] }}</span>
+                </div>
+
+                <h2 class="section-title">HRBP Insights & Recommendations</h2>
+                <p class="section-subtitle">
+                    System-generated analysis based on quantitative scores and qualitative feedback,
+                    tailored to the selected management purpose: {{ report.purpose }}.
+                </p>
+
+                <div class="llm-analysis">
+                    <div class="llm-analysis__badge">
+                        🤖 AI-Generated Analysis
+                    </div>
+                    <div class="llm-analysis__title">
+                        管理目的：{{ report.purpose }} — 專屬建議
+                    </div>
+                    <div class="llm-analysis__content">{{ report.llm_analysis | safe }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div><!-- .report-container -->
+    </div><!-- .report-body -->
+
+    <!-- 雷達圖初始化 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('radarChart');
+            if (!ctx) return;
+
+            // 從模板傳入資料
+            const dimensions = {{ report_dict.dimensions | tojson }};
+
+            // 準備雷達圖資料
+            const labels = dimensions.map(d => d.dimension);
+            const selfScores = dimensions.map(d => d.self_average || 0);
+            const othersScores = dimensions.map(d => d.others_average || 0);
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Self (自評)',
+                            data: selfScores,
+                            borderColor: '#e74c8b',
+                            backgroundColor: 'rgba(231, 76, 139, 0.1)',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#e74c8b',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        },
+                        {
+                            label: 'Others (他評平均)',
+                            data: othersScores,
+                            borderColor: '#2c3e8f',
+                            backgroundColor: 'rgba(44, 62, 143, 0.1)',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#2c3e8f',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 11 },
+                                backdropColor: 'transparent',
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 13,
+                                    weight: '600',
+                                    family: "'Noto Sans TC', 'Inter', sans-serif",
+                                },
+                                color: '#2c3e50',
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.08)',
+                            },
+                            angleLines: {
+                                color: 'rgba(0,0,0,0.08)',
+                            },
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': ' + ctx.parsed.r.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
