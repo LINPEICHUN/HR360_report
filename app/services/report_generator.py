@@ -22,8 +22,9 @@ async def generate_report(
     name: str,
     grade: str,
     purpose: str,
-    api_key: str,
-    api_provider: str,
+    api_key: str = "",
+    api_provider: str = "gemini",
+    model: str = "gemini-1.5-flash",
 ) -> ReportData:
     """
     完整的報告生成 Pipeline。
@@ -89,10 +90,25 @@ async def generate_report(
         collaboration_subordinate_average=collab_data["subordinate_avg"],
     )
 
+    # 7.5. 如果 api_key 為空，嘗試載入全域管理員配置
+    if not api_key or not api_key.strip():
+        import json
+        from pathlib import Path
+        config_path = Path(__file__).resolve().parent.parent / "admin_config.json"
+        if config_path.exists():
+            try:
+                with open(config_path, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                    api_key = config.get("api_key", "")
+                    api_provider = config.get("api_provider", "gemini")
+                    model = config.get("model", "gemini-1.5-flash")
+            except Exception:
+                pass
+
     # 8. LLM 分析
     if api_key and api_key.strip():
         import markdown
-        llm_result = await run_llm_analysis(api_key, api_provider, report_data)
+        llm_result = await run_llm_analysis(api_key, api_provider, report_data, model)
         # 將 Markdown 轉為 HTML
         report_data.llm_analysis = markdown.markdown(llm_result)
 

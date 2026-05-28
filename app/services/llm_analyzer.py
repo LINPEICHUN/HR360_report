@@ -8,6 +8,21 @@ import httpx
 import json
 from ..models.schemas import ReportData
 
+# 達哥 (DaVinci) 官方模型與 api_version 映射表
+DAVINCI_MODEL_VERSION_MAPPING = {
+    "gpt-4o": "2025-03-01-preview",
+    "gpt-4o-mini": "2024-10-21",
+    "gpt-5": "2025-04-01-preview",
+    "gpt-5-mini": "2025-04-01-preview",
+    "gpt-o3-mini": "2024-12-01-preview",
+    "gpt-o3": "2024-12-01-preview",
+    "gemini-3-flash": "2024-10-21",
+    "deepseek-r1-0528": "2024-10-21",
+    "deepseek-v3-2": "2024-05-01-preview",
+    "grok-4-1-fast-reasoning": "2024-05-01-preview",
+    "kimi-k2-thinking": "2024-10-21"
+}
+
 
 # 管理目的對應的分析焦點
 PURPOSE_PROMPTS = {
@@ -262,6 +277,55 @@ async def analyze_with_openai(api_key: str, prompt: str) -> str:
     return response.choices[0].message.content
 
 
+async def analyze_with_davinci(api_key: str, prompt: str, model: str) -> str:
+    """
+    使用 Moxa 達哥 (DaVinci) GAISF API 進行分析（繞過內網 SSL 憑證驗證與 API 閘道 JWT 認證）。
+
+    Args:
+        api_key: 達哥平台 JWT 認證金鑰
+        prompt: 分析 Prompt
+        model: 使用的大模型名稱
+
+    Returns:
+        LLM 生成的分析文字
+    """
+    import httpx
+    import urllib3
+
+    # 關閉內網測試時的 SSL 警告
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    endpoint = "https://moxaingress-gaisf-ingress.azurewebsites.net"
+    api_version = DAVINCI_MODEL_VERSION_MAPPING.get(model, "2024-10-21")
+
+    headers = {
+        "api-key": api_key,
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "messages": [
+            {"role": "system", "content": "你是一位專業的組織發展與人力資源管理顧問。"},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+
+    url = f"{endpoint}/openai/deployments/{model}/chat/completions?api-version={api_version}"
+
+    async with httpx.AsyncClient(verify=False) as client:
+        response = await client.post(url, headers=headers, json=payload, timeout=60.0)
+
+        if response.status_code == 200:
+            data = response.json()
+            try:
+                return data["choices"][0]["message"]["content"]
+            except (KeyError, IndexError):
+                raise Exception(f"達哥 API 回傳格式不符: {data}")
+        else:
+            raise Exception(f"達哥 API 呼叫失敗 ({response.status_code}): {response.text}")
+
+
 async def analyze_feedback(report_data: ReportData) -> str:
     """
     根據報告資料呼叫 LLM 進行分析。
@@ -283,14 +347,16 @@ async def run_llm_analysis(
     api_key: str,
     api_provider: str,
     report_data: ReportData,
+    model: str = "gemini-1.5-flash",
 ) -> str:
     """
     執行 LLM 分析的主入口。
 
     Args:
         api_key: API Key
-        api_provider: "gemini" 或 "openai"
+        api_provider: "gemini"、"openai" 或 "davinci"
         report_data: 完整報告資料
+        model: 使用的大模型名稱
 
     Returns:
         LLM 生成的管理建議
@@ -302,6 +368,8 @@ async def run_llm_analysis(
             result = await analyze_with_gemini(api_key, prompt)
         elif api_provider == "openai":
             result = await analyze_with_openai(api_key, prompt)
+        elif api_provider == "davinci":
+            result = await analyze_with_davinci(api_key, prompt, model)
         else:
             result = f"不支援的 API 提供者：{api_provider}"
         return result

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="360 度回饋系統 - 管理員設定後台">
+    <title>360° Feedback - Admin Portal</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .admin-nav__back {
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .admin-nav__back:hover {
+            color: var(--primary-color, #2c3e8f);
+        }
+        .success-banner {
+            background-color: rgba(46, 204, 113, 0.15);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <!-- 左側導覽列 -->
+        <div class="sidebar-nav">
+            <div class="sidebar-menu">
+                <div class="sidebar-brand">360° Feedback</div>
+                <a href="/" class="sidebar-item">👥 一般使用者</a>
+                <a href="/admin" class="sidebar-item active">🛠️ 管理員後台</a>
+            </div>
+        </div>
+
+        <!-- 右側內容區 -->
+        <div class="content-main">
+            <!-- 標題 -->
+            <header class="header">
+                <span class="header__icon">⚙️</span>
+                <h1 class="header__title">Admin Configuration</h1>
+                <p class="header__subtitle">管理員全域 AI 分析設定與 Moxa 達哥金鑰配置</p>
+            </header>
+
+            <!-- 成功/錯誤提示 -->
+            {% if success %}
+            <div class="success-banner">
+                <span>✅</span>
+                <span>{{ success }}</span>
+            </div>
+            {% endif %}
+            
+            {% if error %}
+            <div class="error-banner">
+                <span>⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- 表單 -->
+            <form id="adminForm" action="/api/admin/config" method="POST">
+                <div class="card">
+                    <div class="card__title">
+                        <span class="card__title-icon">🤖</span>
+                        全域 AI 分析與大模型配置
+                    </div>
+                    
+                    <!-- API 提供商 -->
+                    <div class="form-group">
+                        <label class="form-label" for="apiProvider">API 提供者 (Provider)</label>
+                        <select class="form-select" id="apiProvider" name="api_provider" required>
+                            {% for provider in api_providers %}
+                            <option value="{{ provider.value }}" {% if provider.value == config.api_provider %}selected{% endif %}>{{ provider.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- API Key -->
+                    <div class="form-group">
+                        <label class="form-label" for="apiKey">API 金鑰 (JWT / API Key)</label>
+                        <div class="api-key-wrapper">
+                            <input class="form-input" type="password" id="apiKey" name="api_key" value="{{ config.api_key }}"
+                                   placeholder="請輸入 API 認證金鑰">
+                            <button type="button" class="api-key-toggle" id="apiKeyToggle" title="顯示/隱藏">👁</button>
+                        </div>
+                        <div class="form-hint" id="providerHint">Gemini 與 OpenAI 使用標準 Key；Moxa DaVinci 達哥請填入 JWT 金鑰。</div>
+                    </div>
+
+                    <!-- 選擇模型 -->
+                    <div class="form-group">
+                        <label class="form-label" for="model">使用的分析大模型 (Model)</label>
+                        <select class="form-select" id="model" name="model" required>
+                            <!-- 由 JS 動態填充 -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 提交按鈕 -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="submit-btn__text">
+                        💾 儲存並啟用全域設定
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const providerSelect = document.getElementById("apiProvider");
+            const modelSelect = document.getElementById("model");
+            const providerHint = document.getElementById("providerHint");
+            
+            // 從後端讀取模型映射
+            const modelsData = {{ models_json | safe }};
+            const currentModel = "{{ config.model }}";
+            
+            function updateModelsAndHints() {
+                const provider = providerSelect.value;
+                const models = modelsData[provider] || [];
+                
+                // 1. 更新模型下拉清單
+                modelSelect.innerHTML = "";
+                models.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m.value;
+                    opt.textContent = m.label;
+                    if (m.value === currentModel) {
+                        opt.selected = true;
+                    }
+                    modelSelect.appendChild(opt);
+                });
+                
+                // 2. 更新輸入提示
+                if (provider === "davinci") {
+                    providerHint.textContent = "🔑 已自動切換為 Moxa 達哥 Ingress 閘道，請填入正式環境 JWT 金鑰。支援內網 SSL 憑證繞過與自動協定拼接。";
+                    providerHint.style.color = "#3498db";
+                } else if (provider === "gemini") {
+                    providerHint.textContent = "🔑 請填入標準 Google Gemini API Key。";
+                    providerHint.style.color = "#a4b0be";
+                } else {
+                    providerHint.textContent = "🔑 請填入標準 OpenAI API Key。";
+                    providerHint.style.color = "#a4b0be";
+                }
+            }
+            
+            providerSelect.addEventListener("change", updateModelsAndHints);
+            
+            // 初始化呼叫一次
+            updateModelsAndHints();
+            
+            // 顯示隱藏 API Key
+            const toggleBtn = document.getElementById("apiKeyToggle");
+            const keyInput = document.getElementById("apiKey");
+            if (toggleBtn && keyInput) {
+                toggleBtn.addEventListener("click", function() {
+                    if (keyInput.type === "password") {
+                        keyInput.type = "text";
+                        toggleBtn.textContent = "🔒";
+                    } else {
+                        keyInput.type = "password";
+                        toggleBtn.textContent = "👁";
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -20,108 +20,95 @@
         </ul>
     </div>
 
-    <div class="container">
-        <!-- 標題 -->
-        <header class="header">
-            <span class="header__icon">📊</span>
-            <h1 class="header__title">360° Feedback<br>Report Generator</h1>
-            <p class="header__subtitle">一鍵將問卷資料轉換為專業 360 度回饋報告</p>
-        </header>
-
-        <!-- 錯誤提示 -->
-        {% if error %}
-        <div class="error-banner" id="errorBanner">
-            <span>⚠️</span>
-            <span>{{ error }}</span>
+    <div class="layout-wrapper">
+        <!-- 左側導覽列 -->
+        <div class="sidebar-nav">
+            <div class="sidebar-menu">
+                <div class="sidebar-brand">360° Feedback</div>
+                <a href="/" class="sidebar-item active">👥 一般使用者</a>
+                <a href="/admin" class="sidebar-item">🛠️ 管理員後台</a>
+            </div>
         </div>
-        {% endif %}
 
-        <!-- 表單 -->
-        <form id="reportForm" action="/api/generate-report" method="POST" enctype="multipart/form-data">
+        <!-- 右側內容區 -->
+        <div class="content-main">
+            <!-- 標題 -->
+            <header class="header">
+                <span class="header__icon">📊</span>
+                <h1 class="header__title">360° Feedback<br>Report Generator</h1>
+                <p class="header__subtitle">一鍵將問卷資料轉換為專業 360 度回饋報告</p>
+            </header>
 
-            <!-- AI 設定卡片 -->
-            <div class="card">
-                <div class="card__title">
-                    <span class="card__title-icon">🤖</span>
-                    AI 分析設定
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="apiProvider">API 提供者</label>
-                    <select class="form-select" id="apiProvider" name="api_provider">
-                        {% for provider in api_providers %}
-                        <option value="{{ provider.value }}">{{ provider.label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="apiKey">API Key</label>
-                    <div class="api-key-wrapper">
-                        <input class="form-input" type="password" id="apiKey" name="api_key"
-                               placeholder="輸入您的 API Key（選填，用於 AI 分析）">
-                        <button type="button" class="api-key-toggle" id="apiKeyToggle" title="顯示/隱藏">👁</button>
-                    </div>
-                    <div class="form-hint">未提供 API Key 將跳過 AI 質性分析</div>
-                </div>
+            <!-- 錯誤提示 -->
+            {% if error %}
+            <div class="error-banner" id="errorBanner">
+                <span>⚠️</span>
+                <span>{{ error }}</span>
             </div>
+            {% endif %}
 
-            <!-- 受評者資訊卡片 -->
-            <div class="card">
-                <div class="card__title">
-                    <span class="card__title-icon">👤</span>
-                    受評者資訊
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="subjectName">受評者姓名</label>
-                    <input class="form-input" type="text" id="subjectName" name="name"
-                           placeholder="例如：王大明" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="grade">職級 (Grade)</label>
-                        <select class="form-select" id="grade" name="grade" required>
-                            {% for g in grades %}
-                            <option value="{{ g }}">{{ g }}</option>
-                            {% endfor %}
-                        </select>
+            <!-- 表單 -->
+            <form id="reportForm" action="/api/generate-report" method="POST" enctype="multipart/form-data">
+
+                <!-- 受評者資訊卡片 -->
+                <div class="card">
+                    <div class="card__title">
+                        <span class="card__title-icon">👤</span>
+                        受評者資訊
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="purpose">管理目的</label>
-                        <select class="form-select" id="purpose" name="purpose" required>
-                            {% for p in purposes %}
-                            <option value="{{ p.value }}">{{ p.label }}</option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label" for="subjectName">受評者姓名</label>
+                        <input class="form-input" type="text" id="subjectName" name="name"
+                               placeholder="例如：王大明" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="grade">職級 (Grade)</label>
+                            <select class="form-select" id="grade" name="grade" required>
+                                {% for g in grades %}
+                                <option value="{{ g }}">{{ g }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="purpose">管理目的</label>
+                            <select class="form-select" id="purpose" name="purpose" required>
+                                {% for p in purposes %}
+                                <option value="{{ p.value }}">{{ p.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 檔案上傳卡片 -->
-            <div class="card">
-                <div class="card__title">
-                    <span class="card__title-icon">📁</span>
-                    資料匯入
-                </div>
-                <div class="upload-zone" id="uploadZone">
-                    <span class="upload-zone__icon">📤</span>
-                    <div class="upload-zone__text">拖曳檔案至此處，或點擊選擇檔案</div>
-                    <div class="upload-zone__hint">支援 .xlsx 或 .csv 格式（Google 表單匯出）</div>
-                    <div class="upload-zone__file-info" id="fileInfo">
-                        <span id="fileName"></span>
-                        <button type="button" class="upload-zone__remove" id="removeFile" title="移除檔案">✕</button>
+                <!-- 資料匯入卡片 -->
+                <div class="card">
+                    <div class="card__title">
+                        <span class="card__title-icon">📁</span>
+                        資料匯入
                     </div>
+                    <div class="upload-zone" id="uploadZone">
+                        <span class="upload-zone__icon">📤</span>
+                        <div class="upload-zone__text">拖曳檔案至此處，或點擊選擇檔案</div>
+                        <div class="upload-zone__hint">支援 .xlsx 或 .csv 格式（Google 表單匯出）</div>
+                        <div class="upload-zone__file-info" id="fileInfo">
+                            <span id="fileName"></span>
+                            <button type="button" class="upload-zone__remove" id="removeFile" title="移除檔案">✕</button>
+                        </div>
+                    </div>
+                    <input type="file" class="file-input-hidden" id="fileInput" name="file"
+                           accept=".xlsx,.xls,.csv" required>
                 </div>
-                <input type="file" class="file-input-hidden" id="fileInput" name="file"
-                       accept=".xlsx,.xls,.csv" required>
-            </div>
 
-            <!-- 提交按鈕 -->
-            <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                <span class="submit-btn__text">
-                    📊 產生 360 Feedback 報告
-                </span>
-            </button>
+                <!-- 提交按鈕 -->
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    <span class="submit-btn__text">
+                        📊 產生 360 Feedback 報告
+                    </span>
+                </button>
 
-        </form>
+            </form>
+        </div>
     </div>
 
     <script src="/static/js/app.js"></script>
