@@ -20,24 +20,21 @@
         </ul>
     </div>
 
-    <div class="layout-wrapper">
-        <!-- 左側導覽列 -->
-        <div class="sidebar-nav">
-            <div class="sidebar-menu">
-                <div class="sidebar-brand">360° Feedback</div>
-                <a href="/" class="sidebar-item active">👥 一般使用者</a>
-                <a href="/admin" class="sidebar-item">🛠️ 管理員後台</a>
+    <div class="container">
+        <!-- 標題 -->
+        <header class="header">
+            <span class="header__icon">📊</span>
+            <h1 class="header__title">360° Feedback<br>Report Generator</h1>
+            <p class="header__subtitle">一鍵將問卷資料轉換為專業 360 度回饋報告</p>
+        </header>
+
+        <!-- 藥丸分段切換器 -->
+        <div class="nav-toggle-container">
+            <div class="segmented-control">
+                <a href="/" class="segmented-item active">👥 一般使用者</a>
+                <a href="/admin" class="segmented-item">🛠️ 管理員後台</a>
             </div>
         </div>
-
-        <!-- 右側內容區 -->
-        <div class="content-main">
-            <!-- 標題 -->
-            <header class="header">
-                <span class="header__icon">📊</span>
-                <h1 class="header__title">360° Feedback<br>Report Generator</h1>
-                <p class="header__subtitle">一鍵將問卷資料轉換為專業 360 度回饋報告</p>
-            </header>
 
             <!-- 錯誤提示 -->
             {% if error %}
@@ -125,7 +122,6 @@
 
             </form>
         </div>
-    </div>
 
     <script src="/static/js/app.js?v={{ range(1000, 9999) | random }}"></script>
 </body>

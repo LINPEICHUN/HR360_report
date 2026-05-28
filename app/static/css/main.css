@@ -592,3 +592,48 @@ body::before {
     }
 }
 
+/* ===================================================
+   💎 藥丸型導覽切換器 (Segmented Nav Control)
+   =================================================== */
+.nav-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-xl);
+    position: relative;
+    z-index: 10;
+}
+
+.segmented-control {
+    display: flex;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-glass, rgba(102, 126, 234, 0.15));
+    border-radius: 99px;
+    padding: 4px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.03);
+    gap: 2px;
+}
+
+.segmented-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 10px 20px;
+    color: var(--text-secondary, #475569);
+    text-decoration: none;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all var(--transition-normal, 0.3s ease);
+}
+
+.segmented-item:hover {
+    color: var(--text-primary, #1e293b);
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.segmented-item.active {
+    background: var(--primary-gradient);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(44, 62, 143, 0.15);
+}
+
