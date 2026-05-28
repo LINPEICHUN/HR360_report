@@ -99,3 +99,4 @@ class ReportData(BaseModel):
 
     # LLM 分析結果
     llm_analysis: str = ""                               # LLM 生成的管理建議
+    focus_keywords: str = ""                             # HRBP 指定關注的質性焦點關鍵字

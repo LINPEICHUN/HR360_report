@@ -183,6 +183,17 @@ def _build_analysis_prompt(report_data: ReportData) -> str:
     else:
         purpose_focus = ""
 
+    # 焦點關鍵字引導
+    keyword_focus_prompt = ""
+    if hasattr(report_data, "focus_keywords") and report_data.focus_keywords and report_data.focus_keywords.strip():
+        kws = report_data.focus_keywords.strip()
+        keyword_focus_prompt = (
+            f"\n\n🚨 【特別注意：HRBP 焦點關注關鍵字】 🚨\n"
+            f"本次評估中，HRBP 特別指定需要深度剖析與「{kws}」高度相關的行為表現與質性回饋。\n"
+            f"請在進行「強項總結」、「盲點分析」、「管理建議」及「發展優先序」等所有分析時，"
+            f"特別篩選、優先重視所有提及或隱含這些關鍵字（或類似語意）的量化與質性回饋意見，並於分析段落中進行深度、加強版的解讀與落實對策建議！"
+        )
+
     collab_info = f"- 繼續共事意願（他評平均）：{report_data.collaboration_average}/10"
     if is_l1:
         collab_info = (
@@ -213,7 +224,7 @@ def _build_analysis_prompt(report_data: ReportData) -> str:
 {''.join(qual_summary)}
 
 ## 分析要求
-{purpose_focus}
+{purpose_focus}{keyword_focus_prompt}
 
 請產出一段 **400-600 字**的客觀分析，內容需包含：
 1. **強項總結**：明確指出受評者在哪些面向/題目表現突出（以他評/主管/同儕/部屬分數為依據）

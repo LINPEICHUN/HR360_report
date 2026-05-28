@@ -64,6 +64,7 @@ async def generate_report_api(
     purpose: str = Form(...),
     api_key: str = Form(""),
     api_provider: str = Form(""),
+    focus_keywords: str = Form(""),
 ):
     """
     產生 360 回饋報告。
@@ -85,6 +86,7 @@ async def generate_report_api(
             purpose=purpose,
             api_key=api_key,
             api_provider=api_provider,
+            focus_keywords=focus_keywords,
         )
 
         # 將 Pydantic model 序列化為純 Python dict，供 Jinja2 tojson 使用

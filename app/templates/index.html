@@ -77,7 +77,23 @@
                                 <option value="{{ p.value }}">{{ p.label }}</option>
                                 {% endfor %}
                             </select>
+                            <!-- 動態管理意圖說明備註 -->
+                            <div class="purpose-note-box" id="purposeNoteBox" style="margin-top: 10px; padding: 10px 14px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--report-primary, #2c3e8f); font-size: 0.8rem; line-height: 1.5; color: #555; transition: all 0.3s ease;">
+                                <div id="purposeNoteContent">
+                                    載入中...
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- 質性焦點關鍵字 -->
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label class="form-label" for="focusKeywords">🔑 質性焦點關鍵字 (選填)</label>
+                        <input class="form-input" type="text" id="focusKeywords" name="focus_keywords"
+                               placeholder="例如：溝通、交付穩定度、團隊協作 (多個關鍵字請用逗號隔開)">
+                        <small style="display: block; margin-top: 6px; font-size: 0.78rem; color: #7f8c8d; line-height: 1.4;">
+                            輸入特定關鍵字後，系統在呼叫 AI 分析時會引導 LLM 重點重視並加強剖析與該關鍵字（或語意相關）的量化與質性回饋意見，產出更加符合您關注焦點的顧問分析。
+                        </small>
                     </div>
                 </div>
 

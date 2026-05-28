@@ -25,6 +25,7 @@ async def generate_report(
     api_key: str = "",
     api_provider: str = "gemini",
     model: str = "gemini-1.5-flash",
+    focus_keywords: str = "",
 ) -> ReportData:
     """
     完整的報告生成 Pipeline。
@@ -45,6 +46,7 @@ async def generate_report(
         purpose: 管理目的
         api_key: LLM API Key
         api_provider: LLM API 提供者
+        focus_keywords: HRBP 指定的質性焦點關鍵字
 
     Returns:
         完整的 ReportData
@@ -88,6 +90,7 @@ async def generate_report(
         collaboration_peer_average=collab_data["peer_avg"],
         collaboration_subordinate=collab_data["subordinate"],
         collaboration_subordinate_average=collab_data["subordinate_avg"],
+        focus_keywords=focus_keywords,
     )
 
     # 7.5. 如果 api_key 為空，嘗試載入全域管理員配置

@@ -216,4 +216,45 @@ document.addEventListener('DOMContentLoaded', () => {
             step.textContent = '⏭️ ' + step.textContent.substring(2) + '（已跳過）';
         }
     }
+
+    // --- 管理意圖備註動態更新 ---
+    const purposeSelect = document.getElementById('purpose');
+    const purposeNoteBox = document.getElementById('purposeNoteBox');
+    const purposeNoteContent = document.getElementById('purposeNoteContent');
+
+    const purposeNotes = {
+        'IDP 發展': '<strong>🎯 IDP 發展：</strong>著重分析「自評 vs 他評」落差，深挖「盲點（自評高他評低）」與「痛點（他評或主管評分最低項）」，以推導個人中長期發展計畫。',
+        '績效校準': '<strong>⚖️ 績效校準：</strong>著重比對「實際表現 vs 當前職級 KRA 期待」，明確列出尚未達標的現職行為，評估其現職符合度，作為考核依據。',
+        '晉升評估': '<strong>📈 晉升評估：</strong>著重比對「實際表現 vs 下一職級 KRA 期待」，客觀衡量晉升準備度，並精確標示出 Gap Area (能力差距項目)。',
+        '團隊文化': '<strong>👥 團隊文化：</strong>著重篩選與聚焦特定 Key Elements（第 3、6、8 題），剖析受評者的領導風格、團隊氛圍（心理安全感）與公司文化價值之傳遞。'
+    };
+
+    if (purposeSelect && purposeNoteContent) {
+        purposeSelect.addEventListener('change', () => {
+            const selectedVal = purposeSelect.value;
+            const note = purposeNotes[selectedVal] || `<strong>🎯 ${selectedVal}：</strong>著重於相關面向的量化與質性回饋分析。`;
+            purposeNoteContent.innerHTML = note;
+            
+            // 動態調整卡片外觀
+            if (selectedVal === 'IDP 發展') {
+                purposeNoteBox.style.borderLeftColor = '#e74c8b';
+                purposeNoteBox.style.background = '#fef4f8';
+            } else if (selectedVal === '績效校準') {
+                purposeNoteBox.style.borderLeftColor = '#2c3e8f';
+                purposeNoteBox.style.background = '#f4f6fc';
+            } else if (selectedVal === '晉升評估') {
+                purposeNoteBox.style.borderLeftColor = '#4a5fc1';
+                purposeNoteBox.style.background = '#f8f9ff';
+            } else if (selectedVal === '團隊文化') {
+                purposeNoteBox.style.borderLeftColor = '#8e44ad';
+                purposeNoteBox.style.background = '#faf4fc';
+            } else {
+                purposeNoteBox.style.borderLeftColor = '#2c3e8f';
+                purposeNoteBox.style.background = '#f8f9fa';
+            }
+        });
+        
+        // 初始觸發一次以呈現預設值
+        purposeSelect.dispatchEvent(new Event('change'));
+    }
 });

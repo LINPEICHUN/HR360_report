@@ -589,6 +589,14 @@
                                 {% endif %}
                             </div>
                         </div>
+                        {% if report.focus_keywords %}
+                        <div class="focus-card__item" style="grid-column: span 3; border-left-color: #8e44ad; background: #faf4fc;">
+                            <div class="focus-card__label" style="color: #8e44ad; font-weight: 600;">🔑 質性焦點關注關鍵字 (Focus Keywords)</div>
+                            <div class="focus-card__value" style="color: #2c3e8f; font-weight: 600;">
+                                {{ report.focus_keywords }}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
