@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="360 度回饋系統 - 管理員設定後台">
     <title>360° Feedback - Admin Portal</title>
-    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/main.css?v={{ range(1000, 9999) | random }}">
     <style>
         .admin-nav {
             display: flex;
@@ -13,7 +13,7 @@
             align-items: center;
             margin-bottom: 24px;
             padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.15);
         }
         .admin-nav__back {
             text-decoration: none;
@@ -153,13 +153,13 @@
                 // 2. 更新輸入提示
                 if (provider === "davinci") {
                     providerHint.textContent = "🔑 已自動切換為 Moxa 達哥 Ingress 閘道，請填入正式環境 JWT 金鑰。支援內網 SSL 憑證繞過與自動協定拼接。";
-                    providerHint.style.color = "#3498db";
+                    providerHint.style.color = "#2c3e8f";
                 } else if (provider === "gemini") {
                     providerHint.textContent = "🔑 請填入標準 Google Gemini API Key。";
-                    providerHint.style.color = "#a4b0be";
+                    providerHint.style.color = "#475569";
                 } else {
                     providerHint.textContent = "🔑 請填入標準 OpenAI API Key。";
-                    providerHint.style.color = "#a4b0be";
+                    providerHint.style.color = "#475569";
                 }
             }
             
