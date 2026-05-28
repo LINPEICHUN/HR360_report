@@ -223,7 +223,7 @@ OTHER_FEEDBACK_KEYWORD = "你還有什麼其他回饋"
 
 # 管理目的選項
 MANAGEMENT_PURPOSES = [
-    {"value": "個人發展", "label": "個人發展 (IDP)"},
+    {"value": "IDP 發展", "label": "IDP 發展 (IDP)"},
     {"value": "績效校準", "label": "績效校準 (Performance Calibration)"},
     {"value": "晉升評估", "label": "晉升評估 (Promotion Review)"},
     {"value": "團隊文化", "label": "團隊文化 (Team Culture)"},

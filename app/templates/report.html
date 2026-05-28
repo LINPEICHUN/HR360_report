@@ -535,6 +535,63 @@
                     tailored to the selected management purpose: {{ report.purpose }}.
                 </p>
 
+                <!-- 管理意圖關注焦點橫幅 -->
+                <div class="management-focus-card">
+                    <div class="focus-card__header">
+                        <span class="focus-card__badge">🎯 管理意圖關注焦點 Focus Area</span>
+                    </div>
+                    <div class="focus-card__grid">
+                        <div class="focus-card__item">
+                            <div class="focus-card__label">管理意圖 (Intent)</div>
+                            <div class="focus-card__value">
+                                {% if report.purpose == "IDP 發展" or report.purpose == "個人發展" %}
+                                    🎯 IDP 發展
+                                {% elif report.purpose == "績效校準" %}
+                                    ⚖️ 績效校準
+                                {% elif report.purpose == "晉升評估" %}
+                                    📈 晉升評估
+                                {% elif report.purpose == "團隊文化" %}
+                                    👥 團隊文化
+                                {% else %}
+                                    {{ report.purpose }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="focus-card__item">
+                            <div class="focus-card__label">系統比對邏輯 (Data Logic)</div>
+                            <div class="focus-card__value">
+                                {% if report.purpose == "IDP 發展" or report.purpose == "個人發展" %}
+                                    現職自評 vs 他評
+                                {% elif report.purpose == "績效校準" %}
+                                    實際表現 vs 現任職級 KRA 期待
+                                {% elif report.purpose == "晉升評估" %}
+                                    實際表現 vs 下一職級 KRA 期待
+                                {% elif report.purpose == "團隊文化" %}
+                                    篩選特定 Key Element (3, 6, 8...)
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="focus-card__item">
+                            <div class="focus-card__label">報告視覺核心 (Report Focus)</div>
+                            <div class="focus-card__value">
+                                {% if report.purpose == "IDP 發展" or report.purpose == "個人發展" %}
+                                    盲點與痛點 (落差最大、得分最低項)
+                                {% elif report.purpose == "績效校準" %}
+                                    現職符合度 (有哪些現職行為未達標)
+                                {% elif report.purpose == "晉升評估" %}
+                                    晉升準備度 (與下一階行為的 Gap Area)
+                                {% elif report.purpose == "團隊文化" %}
+                                    領導風格與氛圍 (心理安全感與文化傳遞)
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="llm-analysis">
                     <div class="llm-analysis__badge">
                         🤖 AI-Generated Analysis

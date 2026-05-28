@@ -629,6 +629,72 @@ body {
     margin-bottom: 6px;
 }
 
+/* 管理意圖關注焦點橫幅 */
+.management-focus-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+    border: 1.5px solid rgba(44, 62, 143, 0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 18px rgba(44, 62, 143, 0.04);
+}
+
+.focus-card__header {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.focus-card__badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(44, 62, 143, 0.08);
+    color: var(--report-primary);
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.focus-card__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.focus-card__item {
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid rgba(44, 62, 143, 0.06);
+    border-radius: 8px;
+    border-left: 4.5px solid var(--report-primary-light);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+}
+
+.focus-card__item:first-child {
+    border-left-color: var(--report-accent);
+}
+
+.focus-card__item:last-child {
+    border-left-color: var(--report-subordinates-color);
+}
+
+.focus-card__label {
+    font-size: 0.75rem;
+    color: var(--report-text-secondary);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.focus-card__value {
+    font-size: 0.88rem;
+    color: var(--report-text);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
 /* LLM 分析區 */
 .llm-analysis {
     background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
@@ -725,6 +791,27 @@ body {
 
     .llm-analysis {
         page-break-inside: avoid;
+    }
+
+    .management-focus-card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        border: 1.5px solid rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .focus-card__item {
+        background: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-left: 4.5px solid #2c3e8f !important;
+    }
+
+    .focus-card__item:first-child {
+        border-left-color: #e74c8b !important;
+    }
+
+    .focus-card__item:last-child {
+        border-left-color: #e67e22 !important;
     }
 
     @page {
