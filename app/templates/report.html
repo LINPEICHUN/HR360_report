@@ -79,6 +79,24 @@
 
                 <!-- 圖例 -->
                 <div class="radar-legend">
+                    {% if report.grade == 'L1' %}
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--self"></div>
+                        <span>Self (自評)</span>
+                    </div>
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--manager"></div>
+                        <span>Manager (主管評)</span>
+                    </div>
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--peers"></div>
+                        <span>Peers (同儕平均)</span>
+                    </div>
+                    <div class="radar-legend-item">
+                        <div class="radar-legend-dot radar-legend-dot--subordinates"></div>
+                        <span>Subordinates (部屬平均)</span>
+                    </div>
+                    {% else %}
                     <div class="radar-legend-item">
                         <div class="radar-legend-dot radar-legend-dot--self"></div>
                         <span>Self (自評)</span>
@@ -87,6 +105,7 @@
                         <div class="radar-legend-dot radar-legend-dot--others"></div>
                         <span>Others (他評平均)</span>
                     </div>
+                    {% endif %}
                 </div>
 
                 <!-- 評分量表 -->
@@ -149,7 +168,25 @@
                 </div>
 
                 <!-- 面向摘要 -->
-                <div class="dimension-summary-bar">
+                <div class="dimension-summary-bar" style="display:flex;flex-wrap:wrap;gap:12px 24px;">
+                    {% if report.grade == 'L1' %}
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--self" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        自評平均: <strong>{{ "%.2f"|format(dim.self_average) if dim.self_average is not none else "N/A" }}</strong>
+                    </div>
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--manager" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        主管平均: <strong>{{ "%.2f"|format(dim.manager_average) if dim.manager_average is not none else "N/A" }}</strong>
+                    </div>
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--peers" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        同儕平均: <strong>{{ "%.2f"|format(dim.peer_average) if dim.peer_average is not none else "N/A" }}</strong>
+                    </div>
+                    <div class="dimension-summary-item">
+                        <span class="score-dot score-dot--subordinates" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
+                        部屬平均: <strong>{{ "%.2f"|format(dim.subordinate_average) if dim.subordinate_average is not none else "N/A" }}</strong>
+                    </div>
+                    {% else %}
                     <div class="dimension-summary-item">
                         <span class="score-dot score-dot--self" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
                         自評平均: <strong>{{ "%.2f"|format(dim.self_average) if dim.self_average is not none else "N/A" }}</strong>
@@ -158,6 +195,7 @@
                         <span class="score-dot score-dot--others" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>
                         他評平均: <strong>{{ "%.2f"|format(dim.others_average) if dim.others_average is not none else "N/A" }}</strong>
                     </div>
+                    {% endif %}
                 </div>
 
                 <!-- In Summary -->
@@ -168,6 +206,40 @@
                 <div class="question-card">
                     <div class="question-card__title">{{ q.question_full }}</div>
                     <div class="question-card__title-en">({{ q.question_en }})</div>
+                    {% if report.grade == 'L1' %}
+                    <div class="question-scores" style="grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                        <div class="score-item">
+                            <span class="score-dot score-dot--self"></span>
+                            <span class="score-label">Self:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.self_score) if q.self_score is not none else "N/A" }}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-dot score-dot--manager"></span>
+                            <span class="score-label">Manager:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.manager_score) if q.manager_score is not none else "N/A" }}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-dot score-dot--peers"></span>
+                            <span class="score-label">Peers Avg:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.peer_average) if q.peer_average is not none else "N/A" }}</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-dot score-dot--subordinates"></span>
+                            <span class="score-label">Subs Avg:</span>
+                            <span class="score-value">{{ "%.2f"|format(q.subordinate_average) if q.subordinate_average is not none else "N/A" }}</span>
+                        </div>
+                    </div>
+                    <div class="individual-scores" style="display:flex; flex-direction:column; gap:4px;">
+                        <div>
+                            <strong>Peers Individual: </strong>
+                            {% for s in q.peer_scores %}{{ "%.0f"|format(s) if s is not none else "N/A" }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        </div>
+                        <div>
+                            <strong>Subordinates Individual: </strong>
+                            {% for s in q.subordinate_scores %}{{ "%.0f"|format(s) if s is not none else "N/A" }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
                     <div class="question-scores">
                         <div class="score-item">
                             <span class="score-dot score-dot--self"></span>
@@ -184,6 +256,7 @@
                         <strong>Individual Scores: </strong>
                         {% for s in q.individual_scores %}{{ "%.0f"|format(s) if s is not none else "N/A" }}{% if not loop.last %}, {% endif %}{% endfor %}
                     </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
 
@@ -228,13 +301,41 @@
                             <strong>You answered:</strong> {{ qf.positive_self }}
                         </div>
                         {% endif %}
-                        {% if qf.positive_others %}
-                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
-                        <ul class="feedback-others-list">
-                            {% for fb in qf.positive_others %}
-                            <li>{{ fb }}</li>
-                            {% endfor %}
-                        </ul>
+                        
+                        {% if report.grade == 'L1' %}
+                            {% if qf.positive_manager %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-manager-color);">主管回饋:</div>
+                            <ul class="feedback-manager-list">
+                                {% for fb in qf.positive_manager %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            {% if qf.positive_peer %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-peers-color);">同儕回饋:</div>
+                            <ul class="feedback-peers-list">
+                                {% for fb in qf.positive_peer %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            {% if qf.positive_subordinate %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-subordinates-color);">部屬回饋:</div>
+                            <ul class="feedback-subordinates-list">
+                                {% for fb in qf.positive_subordinate %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        {% else %}
+                            {% if qf.positive_others %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
+                            <ul class="feedback-others-list">
+                                {% for fb in qf.positive_others %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         {% endif %}
                     </div>
 
@@ -246,64 +347,175 @@
                             <strong>You answered:</strong> {{ qf.improve_self }}
                         </div>
                         {% endif %}
-                        {% if qf.improve_others %}
-                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
-                        <ul class="feedback-others-list">
-                            {% for fb in qf.improve_others %}
-                            <li>{{ fb }}</li>
-                            {% endfor %}
-                        </ul>
+                        
+                        {% if report.grade == 'L1' %}
+                            {% if qf.improve_manager %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-manager-color);">主管回饋:</div>
+                            <ul class="feedback-manager-list">
+                                {% for fb in qf.improve_manager %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            {% if qf.improve_peer %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-peers-color);">同儕回饋:</div>
+                            <ul class="feedback-peers-list">
+                                {% for fb in qf.improve_peer %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            {% if qf.improve_subordinate %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-subordinates-color);">部屬回饋:</div>
+                            <ul class="feedback-subordinates-list">
+                                {% for fb in qf.improve_subordinate %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        {% else %}
+                            {% if qf.improve_others %}
+                            <div class="feedback-subsection__label" style="font-size:0.75rem;color:#999;">Respondents' Feedback:</div>
+                            <ul class="feedback-others-list">
+                                {% for fb in qf.improve_others %}
+                                <li>{{ fb }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
 
                 <!-- 其他回饋 -->
-                {% if report.other_feedback_self or report.other_feedback_others %}
-                <div class="qualitative-dim-block">
-                    <div class="qualitative-dim-label">
-                        <span class="qualitative-dim-dot" style="background:#8e44ad"></span>
-                        其他回饋與建議
-                    </div>
-                    {% if report.other_feedback_self %}
-                    <div class="feedback-self">
-                        <strong>You answered:</strong> {{ report.other_feedback_self }}
+                {% if report.grade == 'L1' %}
+                    {% if report.other_feedback_self or report.other_feedback_manager or report.other_feedback_peer or report.other_feedback_subordinate %}
+                    <div class="qualitative-dim-block">
+                        <div class="qualitative-dim-label">
+                            <span class="qualitative-dim-dot" style="background:#8e44ad"></span>
+                            其他回饋與建議
+                        </div>
+                        {% if report.other_feedback_self %}
+                        <div class="feedback-self">
+                            <strong>You answered:</strong> {{ report.other_feedback_self }}
+                        </div>
+                        {% endif %}
+                        {% if report.other_feedback_manager %}
+                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-manager-color);margin-top:8px;">主管回饋:</div>
+                        <ul class="feedback-manager-list">
+                            {% for fb in report.other_feedback_manager %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if report.other_feedback_peer %}
+                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-peers-color);margin-top:8px;">同儕回饋:</div>
+                        <ul class="feedback-peers-list">
+                            {% for fb in report.other_feedback_peer %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        {% if report.other_feedback_subordinate %}
+                        <div class="feedback-subsection__label" style="font-size:0.75rem;color:var(--report-subordinates-color);margin-top:8px;">部屬回饋:</div>
+                        <ul class="feedback-subordinates-list">
+                            {% for fb in report.other_feedback_subordinate %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                     </div>
                     {% endif %}
-                    {% if report.other_feedback_others %}
-                    <ul class="feedback-others-list">
-                        {% for fb in report.other_feedback_others %}
-                        <li>{{ fb }}</li>
-                        {% endfor %}
-                    </ul>
+                {% else %}
+                    {% if report.other_feedback_self or report.other_feedback_others %}
+                    <div class="qualitative-dim-block">
+                        <div class="qualitative-dim-label">
+                            <span class="qualitative-dim-dot" style="background:#8e44ad"></span>
+                            其他回饋與建議
+                        </div>
+                        {% if report.other_feedback_self %}
+                        <div class="feedback-self">
+                            <strong>You answered:</strong> {{ report.other_feedback_self }}
+                        </div>
+                        {% endif %}
+                        {% if report.other_feedback_others %}
+                        <ul class="feedback-others-list">
+                            {% for fb in report.other_feedback_others %}
+                            <li>{{ fb }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
                     {% endif %}
-                </div>
                 {% endif %}
 
                 <!-- 繼續共事意願 -->
-                {% if report.collaboration_average is not none %}
-                <div class="qualitative-dim-block" style="margin-top:20px;">
-                    <div class="qualitative-dim-label">
-                        <span class="qualitative-dim-dot" style="background:#2980b9"></span>
-                        繼續共事意願 (1-10 分)
-                    </div>
-                    <div class="question-scores" style="margin-top:8px;">
-                        <div class="score-item">
-                            <span class="score-dot score-dot--self"></span>
-                            <span class="score-label">Self:</span>
-                            <span class="score-value">{{ report.collaboration_self if report.collaboration_self is not none else "N/A" }}</span>
+                {% if report.grade == 'L1' %}
+                    {% if report.collaboration_peer_average is not none or report.collaboration_subordinate_average is not none or report.collaboration_manager is not none %}
+                    <div class="qualitative-dim-block" style="margin-top:20px;">
+                        <div class="qualitative-dim-label">
+                            <span class="qualitative-dim-dot" style="background:#2980b9"></span>
+                            繼續共事意願 (1-10 分)
                         </div>
-                        <div class="score-item">
-                            <span class="score-dot score-dot--others"></span>
-                            <span class="score-label">Others Avg:</span>
-                            <span class="score-value">{{ "%.1f"|format(report.collaboration_average) }}</span>
+                        <div class="question-scores" style="margin-top:8px; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                            <div class="score-item">
+                                <span class="score-dot score-dot--self"></span>
+                                <span class="score-label">Self:</span>
+                                <span class="score-value">{{ report.collaboration_self if report.collaboration_self is not none else "N/A" }}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-dot score-dot--manager"></span>
+                                <span class="score-label">Manager:</span>
+                                <span class="score-value">{{ report.collaboration_manager if report.collaboration_manager is not none else "N/A" }}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-dot score-dot--peers"></span>
+                                <span class="score-label">Peers Avg:</span>
+                                <span class="score-value">{{ "%.1f"|format(report.collaboration_peer_average) if report.collaboration_peer_average is not none else "N/A" }}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-dot score-dot--subordinates"></span>
+                                <span class="score-label">Subs Avg:</span>
+                                <span class="score-value">{{ "%.1f"|format(report.collaboration_subordinate_average) if report.collaboration_subordinate_average is not none else "N/A" }}</span>
+                            </div>
+                        </div>
+                        <div class="individual-scores" style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+                            <div>
+                                <strong>Peers: </strong>
+                                {% for s in report.collaboration_peer %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+                            </div>
+                            <div>
+                                <strong>Subordinates: </strong>
+                                {% for s in report.collaboration_subordinate %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+                            </div>
                         </div>
                     </div>
-                    <div class="individual-scores" style="margin-top:8px;">
-                        <strong>Individual: </strong>
-                        {% for s in report.collaboration_others %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    {% endif %}
+                {% else %}
+                    {% if report.collaboration_average is not none %}
+                    <div class="qualitative-dim-block" style="margin-top:20px;">
+                        <div class="qualitative-dim-label">
+                            <span class="qualitative-dim-dot" style="background:#2980b9"></span>
+                            繼續共事意願 (1-10 分)
+                        </div>
+                        <div class="question-scores" style="margin-top:8px;">
+                            <div class="score-item">
+                                <span class="score-dot score-dot--self"></span>
+                                <span class="score-label">Self:</span>
+                                <span class="score-value">{{ report.collaboration_self if report.collaboration_self is not none else "N/A" }}</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-dot score-dot--others"></span>
+                                <span class="score-label">Others Avg:</span>
+                                <span class="score-value">{{ "%.1f"|format(report.collaboration_average) }}</span>
+                            </div>
+                        </div>
+                        <div class="individual-scores" style="margin-top:8px;">
+                            <strong>Individual: </strong>
+                            {% for s in report.collaboration_others %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -350,38 +562,100 @@
             // 準備雷達圖資料
             const labels = dimensions.map(d => d.dimension);
             const selfScores = dimensions.map(d => d.self_average || 0);
-            const othersScores = dimensions.map(d => d.others_average || 0);
+
+            const isL1 = "{{ report.grade }}" === "L1";
+            let datasets = [];
+
+            if (isL1) {
+                const managerScores = dimensions.map(d => d.manager_average || 0);
+                const peerScores = dimensions.map(d => d.peer_average || 0);
+                const subScores = dimensions.map(d => d.subordinate_average || 0);
+
+                datasets = [
+                    {
+                        label: 'Self (自評)',
+                        data: selfScores,
+                        borderColor: '#e74c8b',
+                        backgroundColor: 'rgba(231, 76, 139, 0.05)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#e74c8b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    },
+                    {
+                        label: 'Manager (主管評)',
+                        data: managerScores,
+                        borderColor: '#2c3e8f',
+                        backgroundColor: 'rgba(44, 62, 143, 0.05)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#2c3e8f',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    },
+                    {
+                        label: 'Peers (同儕平均)',
+                        data: peerScores,
+                        borderColor: '#00b894',
+                        backgroundColor: 'rgba(0, 184, 148, 0.05)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#00b894',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    },
+                    {
+                        label: 'Subordinates (部屬平均)',
+                        data: subScores,
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230, 126, 34, 0.05)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#e67e22',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    }
+                ];
+            } else {
+                const othersScores = dimensions.map(d => d.others_average || 0);
+                datasets = [
+                    {
+                        label: 'Self (自評)',
+                        data: selfScores,
+                        borderColor: '#e74c8b',
+                        backgroundColor: 'rgba(231, 76, 139, 0.1)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#e74c8b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    },
+                    {
+                        label: 'Others (他評平均)',
+                        data: othersScores,
+                        borderColor: '#2c3e8f',
+                        backgroundColor: 'rgba(44, 62, 143, 0.1)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#2c3e8f',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                    }
+                ];
+            }
 
             new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Self (自評)',
-                            data: selfScores,
-                            borderColor: '#e74c8b',
-                            backgroundColor: 'rgba(231, 76, 139, 0.1)',
-                            borderWidth: 2.5,
-                            pointBackgroundColor: '#e74c8b',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                        },
-                        {
-                            label: 'Others (他評平均)',
-                            data: othersScores,
-                            borderColor: '#2c3e8f',
-                            backgroundColor: 'rgba(44, 62, 143, 0.1)',
-                            borderWidth: 2.5,
-                            pointBackgroundColor: '#2c3e8f',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,

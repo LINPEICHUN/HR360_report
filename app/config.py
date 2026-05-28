@@ -26,9 +26,8 @@ SELF_ROLE_KEYWORD = "受評者自己"
 # 角色欄位名稱（含可能的空白字元）
 ROLE_COLUMN_KEYWORD = "填寫者的角色"
 
-# 三大面向與對應題目定義
-# 鍵 = 面向名稱，值 = 該面向下的量化題目欄位關鍵字列表
-DIMENSIONS: dict[str, dict] = {
+# 三大面向與對應題目定義（區分 L0 / L1）
+DIMENSIONS_L0: dict[str, dict] = {
     "帶領團隊": {
         "label_en": "Leading Team",
         "questions": [
@@ -116,6 +115,105 @@ DIMENSIONS: dict[str, dict] = {
         "qualitative_improve_keyword": "在「完成任務」面向，為了更好地推動任務與目標",
     },
 }
+
+DIMENSIONS_L1: dict[str, dict] = {
+    "帶領團隊": {
+        "label_en": "Leading Team",
+        "questions": [
+            {
+                "keyword": "組建團隊",
+                "full_name": "組建團隊：部門組織規劃與工作設計",
+                "name_en": "Team Building",
+            },
+            {
+                "keyword": "目標衡量",
+                "full_name": "目標衡量：連結公司或組織目標，建立部門與個人的衡量指標",
+                "name_en": "Goal Setting & Measurement",
+            },
+            {
+                "keyword": "團隊文化",
+                "full_name": "團隊文化：實踐公司理念，凝聚團隊向心力",
+                "name_en": "Team Culture",
+            },
+            {
+                "keyword": "部門合作",
+                "full_name": "部門合作：推動跨部門協作，辨識難點(流程/組織)，並提出可行協作計畫",
+                "name_en": "Cross-team Collaboration",
+            },
+        ],
+        "qualitative_positive_keyword": "在「帶領團隊」面向，你認為受評者做得最好的地方",
+        "qualitative_improve_keyword": "在「帶領團隊」面向，為了讓團隊運作更順暢",
+    },
+    "發展個人": {
+        "label_en": "Developing People",
+        "questions": [
+            {
+                "keyword": "以身作則",
+                "full_name": "以身作則：以身作則發展自我，於工作中開始展現自我覺察與反思",
+                "name_en": "Leading by Example",
+            },
+            {
+                "keyword": "理解支持",
+                "full_name": "理解支持：透過職涯對話(Career Talk)，激勵與支持個人的發展",
+                "name_en": "Understanding & Support",
+            },
+            {
+                "keyword": "發展連結",
+                "full_name": "發展連結：運用組織內外部資源，拓展成員學習發展平台",
+                "name_en": "Development Alignment",
+            },
+            {
+                "keyword": "回饋對話",
+                "full_name": "回饋對話：給予真誠發展回饋，面對困難對話，在對話過程中心相互學習",
+                "name_en": "Feedback & Dialogue",
+            },
+        ],
+        "qualitative_positive_keyword": "在「發展個人」面向，你認為受評者做得最好的地方",
+        "qualitative_improve_keyword": "在「發展個人」面向，為了更好地支持人才成長",
+    },
+    "完成任務": {
+        "label_en": "Accomplishing Tasks",
+        "questions": [
+            {
+                "keyword": "任務目標",
+                "full_name": "任務目標：連結公司或組織目標，規劃部門短中長期目標",
+                "name_en": "Task Objectives",
+            },
+            {
+                "keyword": "資源整合",
+                "full_name": "資源整合：盤點橫向協作資源，建立上下游跨單位協作機制",
+                "name_en": "Resource Integration",
+            },
+            {
+                "keyword": "進度衡量",
+                "full_name": "進度衡量：設計有效衡量指標，追蹤團隊成果並適時調整",
+                "name_en": "Progress Tracking",
+            },
+            {
+                "keyword": "風險管理",
+                "full_name": "風險管理：評估風險與可能衝擊，提出因應對策及備案規劃並介入處理",
+                "name_en": "Risk Management",
+            },
+            {
+                "keyword": "回顧優化",
+                "full_name": "回顧優化：建立任務回顧機制(Retro)，優化部門營運與跨部門協作效能",
+                "name_en": "Review & Optimization",
+            },
+        ],
+        "qualitative_positive_keyword": "在「完成任務」面向，你認為受評者做得最好的地方",
+        "qualitative_improve_keyword": "在「完成任務」面向，為了更好地推動任務與目標",
+    },
+}
+
+def get_dimensions(grade: str = "L0") -> dict:
+    """根據職級獲取面向與題目設定"""
+    if grade == "L1":
+        return DIMENSIONS_L1
+    return DIMENSIONS_L0
+
+# 相容預設值
+DIMENSIONS = DIMENSIONS_L0
+
 
 # 額外題目：繼續共事意願
 COLLABORATION_KEYWORD = "若有選擇機會"

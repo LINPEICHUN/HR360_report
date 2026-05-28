@@ -55,18 +55,16 @@ async def generate_report(
     self_df, others_df = split_by_role(df)
 
     # 3. 計算分數
-    dimensions = calculate_all_scores(self_df, others_df)
+    dimensions = calculate_all_scores(self_df, others_df, grade)
 
     # 4. 提取質性回饋
-    qualitative = extract_qualitative_feedback(self_df, others_df)
+    qualitative = extract_qualitative_feedback(self_df, others_df, grade)
 
     # 5. 提取其他回饋
-    other_self, other_others = extract_other_feedback(self_df, others_df)
+    other_data = extract_other_feedback(self_df, others_df, grade)
 
     # 6. 提取共事意願
-    collab_self, collab_others, collab_avg = extract_collaboration_scores(
-        self_df, others_df
-    )
+    collab_data = extract_collaboration_scores(self_df, others_df, grade)
 
     # 7. 組裝初始報告資料（不含 LLM 分析）
     report_data = ReportData(
@@ -76,11 +74,19 @@ async def generate_report(
         generated_at=datetime.now().strftime("%Y 年 %m 月 %d 日"),
         dimensions=dimensions,
         qualitative=qualitative,
-        other_feedback_self=other_self,
-        other_feedback_others=other_others,
-        collaboration_self=collab_self,
-        collaboration_others=collab_others,
-        collaboration_average=collab_avg,
+        other_feedback_self=other_data["self"],
+        other_feedback_others=other_data["others"],
+        other_feedback_manager=other_data["manager"],
+        other_feedback_peer=other_data["peer"],
+        other_feedback_subordinate=other_data["subordinate"],
+        collaboration_self=collab_data["self"],
+        collaboration_others=collab_data["others"],
+        collaboration_average=collab_data["others_avg"],
+        collaboration_manager=collab_data["manager"],
+        collaboration_peer=collab_data["peer"],
+        collaboration_peer_average=collab_data["peer_avg"],
+        collaboration_subordinate=collab_data["subordinate"],
+        collaboration_subordinate_average=collab_data["subordinate_avg"],
     )
 
     # 8. LLM 分析

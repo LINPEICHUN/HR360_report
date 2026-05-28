@@ -25,6 +25,13 @@ class QuestionScore(BaseModel):
     others_average: float | None = None                 # 他評平均分
     individual_scores: list[float | None] = []          # 隨機化個別分數
 
+    # L1 專用細分評分
+    manager_score: float | None = None                  # 主管評分
+    peer_average: float | None = None                   # 同儕評分平均
+    subordinate_average: float | None = None            # 部屬評分平均
+    peer_scores: list[float | None] = []                # 隨機化個別同儕分數
+    subordinate_scores: list[float | None] = []         # 隨機化個別部屬分數
+
 
 class DimensionSummary(BaseModel):
     """面向摘要"""
@@ -34,6 +41,11 @@ class DimensionSummary(BaseModel):
     others_average: float | None = None                 # 該面向他評平均
     questions: list[QuestionScore] = []                 # 該面向所有題目
 
+    # L1 專用細分面向平均
+    manager_average: float | None = None                # 該面向主管評分
+    peer_average: float | None = None                   # 該面向同儕平均
+    subordinate_average: float | None = None            # 該面向部屬平均
+
 
 class QualitativeFeedback(BaseModel):
     """質性回饋"""
@@ -42,6 +54,14 @@ class QualitativeFeedback(BaseModel):
     positive_others: list[str] = []                     # 他評 - 做得好的
     improve_self: str = ""                              # 自評 - 建議改善的
     improve_others: list[str] = []                      # 他評 - 建議改善的
+
+    # L1 專用細分回饋
+    positive_manager: list[str] = []                    # 主管回饋 - 做得好的
+    positive_peer: list[str] = []                       # 同儕回饋 - 做得好的 (打亂)
+    positive_subordinate: list[str] = []                # 部屬回饋 - 做得好的 (打亂)
+    improve_manager: list[str] = []                     # 主管回饋 - 建議改善的
+    improve_peer: list[str] = []                        # 同儕回饋 - 建議改善的 (打亂)
+    improve_subordinate: list[str] = []                 # 部屬回饋 - 建議改善的 (打亂)
 
 
 class ReportData(BaseModel):
@@ -60,10 +80,22 @@ class ReportData(BaseModel):
     other_feedback_self: str = ""                        # 自評其他回饋
     other_feedback_others: list[str] = []                # 他評其他回饋
 
+    # L1 專用細分其他回饋
+    other_feedback_manager: list[str] = []              # 主管其他回饋
+    other_feedback_peer: list[str] = []                 # 同儕其他回饋 (打亂)
+    other_feedback_subordinate: list[str] = []          # 部屬其他回饋 (打亂)
+
     # 繼續共事意願
     collaboration_self: int | None = None                # 自評共事意願
     collaboration_others: list[int] = []                 # 他評共事意願
     collaboration_average: float | None = None           # 他評共事意願平均
+
+    # L1 專用細分共事意願
+    collaboration_manager: int | None = None            # 主管共事意願
+    collaboration_peer: list[int] = []                  # 同儕共事意願列表
+    collaboration_peer_average: float | None = None     # 同儕共事意願平均
+    collaboration_subordinate: list[int] = []           # 部屬共事意願列表
+    collaboration_subordinate_average: float | None = None # 部屬共事意願平均
 
     # LLM 分析結果
     llm_analysis: str = ""                               # LLM 生成的管理建議

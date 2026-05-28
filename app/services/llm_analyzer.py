@@ -44,38 +44,110 @@ def _build_analysis_prompt(report_data: ReportData) -> str:
     Returns:
         結構化的 Prompt 字串
     """
+    is_l1 = report_data.grade == "L1"
+
     # 組裝分數資料摘要
     score_summary = []
     for dim in report_data.dimensions:
         score_summary.append(f"\n### {dim.dimension} ({dim.dimension_en})")
-        score_summary.append(
-            f"面向平均 — 自評: {dim.self_average}, 他評: {dim.others_average}"
-        )
-        for q in dim.questions:
+        if is_l1:
             score_summary.append(
-                f"  - {q.question_full}: 自評 {q.self_score}, 他評平均 {q.others_average}"
+                f"面向平均 — 自評: {dim.self_average}, 主管評: {dim.manager_average}, 同儕平均: {dim.peer_average}, 部屬平均: {dim.subordinate_average}"
             )
+            for q in dim.questions:
+                score_summary.append(
+                    f"  - {q.question_full}: 自評 {q.self_score}, 主管評 {q.manager_score}, 同儕平均 {q.peer_average}, 部屬平均 {q.subordinate_average}"
+                )
+        else:
+            score_summary.append(
+                f"面向平均 — 自評: {dim.self_average}, 他評: {dim.others_average}"
+            )
+            for q in dim.questions:
+                score_summary.append(
+                    f"  - {q.question_full}: 自評 {q.self_score}, 他評平均 {q.others_average}"
+                )
 
     # 組裝質性回饋
     qual_summary = []
     for qf in report_data.qualitative:
         qual_summary.append(f"\n### {qf.dimension}")
         qual_summary.append(f"【做得好 - 自評】{qf.positive_self}")
-        qual_summary.append(f"【做得好 - 他人回饋】")
-        for fb in qf.positive_others:
-            qual_summary.append(f"  - {fb}")
+        
+        if is_l1:
+            if qf.positive_manager:
+                qual_summary.append(f"【做得好 - 主管回饋】")
+                for fb in qf.positive_manager:
+                    qual_summary.append(f"  - {fb}")
+            if qf.positive_peer:
+                qual_summary.append(f"【做得好 - 同儕回饋】")
+                for fb in qf.positive_peer:
+                    qual_summary.append(f"  - {fb}")
+            if qf.positive_subordinate:
+                qual_summary.append(f"【做得好 - 部屬回饋】")
+                for fb in qf.positive_subordinate:
+                    qual_summary.append(f"  - {fb}")
+        else:
+            qual_summary.append(f"【做得好 - 他人回饋】")
+            for fb in qf.positive_others:
+                qual_summary.append(f"  - {fb}")
+
         qual_summary.append(f"【建議改善 - 自評】{qf.improve_self}")
-        qual_summary.append(f"【建議改善 - 他人回饋】")
-        for fb in qf.improve_others:
-            qual_summary.append(f"  - {fb}")
+        
+        if is_l1:
+            if qf.improve_manager:
+                qual_summary.append(f"【建議改善 - 主管回饋】")
+                for fb in qf.improve_manager:
+                    qual_summary.append(f"  - {fb}")
+            if qf.improve_peer:
+                qual_summary.append(f"【建議改善 - 同儕回饋】")
+                for fb in qf.improve_peer:
+                    qual_summary.append(f"  - {fb}")
+            if qf.improve_subordinate:
+                qual_summary.append(f"【建議改善 - 部屬回饋】")
+                for fb in qf.improve_subordinate:
+                    qual_summary.append(f"  - {fb}")
+        else:
+            qual_summary.append(f"【建議改善 - 他人回饋】")
+            for fb in qf.improve_others:
+                qual_summary.append(f"  - {fb}")
 
     # 額外回饋
-    if report_data.other_feedback_others:
-        qual_summary.append("\n### 其他回饋")
-        for fb in report_data.other_feedback_others:
-            qual_summary.append(f"  - {fb}")
+    if is_l1:
+        if report_data.other_feedback_manager or report_data.other_feedback_peer or report_data.other_feedback_subordinate:
+            qual_summary.append("\n### 其他回饋")
+            if report_data.other_feedback_manager:
+                qual_summary.append(f"【其他回饋 - 主管】")
+                for fb in report_data.other_feedback_manager:
+                    qual_summary.append(f"  - {fb}")
+            if report_data.other_feedback_peer:
+                qual_summary.append(f"【其他回饋 - 同儕】")
+                for fb in report_data.other_feedback_peer:
+                    qual_summary.append(f"  - {fb}")
+            if report_data.other_feedback_subordinate:
+                qual_summary.append(f"【其他回饋 - 部屬】")
+                for fb in report_data.other_feedback_subordinate:
+                    qual_summary.append(f"  - {fb}")
+    else:
+        if report_data.other_feedback_others:
+            qual_summary.append("\n### 其他回饋")
+            for fb in report_data.other_feedback_others:
+                qual_summary.append(f"  - {fb}")
 
     purpose_focus = PURPOSE_PROMPTS.get(report_data.purpose, "")
+
+    collab_info = f"- 繼續共事意願（他評平均）：{report_data.collaboration_average}/10"
+    if is_l1:
+        collab_info = (
+            f"- 繼續共事意願：\n"
+            f"  * 主管意願：{report_data.collaboration_manager if report_data.collaboration_manager is not None else 'N/A'}/10\n"
+            f"  * 同儕平均意願：{report_data.collaboration_peer_average if report_data.collaboration_peer_average is not None else 'N/A'}/10\n"
+            f"  * 部屬平均意願：{report_data.collaboration_subordinate_average if report_data.collaboration_subordinate_average is not None else 'N/A'}/10"
+        )
+
+    # 針對 L1 和 L0 的 AI 分析分析焦點說明
+    analysis_focus = "找出自評與他評落差最大的項目，分析可能原因"
+    if is_l1:
+        analysis_focus = "對比自評、主管、同儕及部屬評分的落差與期待盲點，重點分析受評者在『向上管理、平級協作、向下帶領』三種關係中的互動盲區，並推導背後可能原因。"
 
     prompt = f"""你是一位專業的組織發展顧問與 HRBP 顧問。
 以下是一份 360 度回饋報告的結構化資料，請根據這些資料為 HRBP 產出一段專業、客觀的分析建議。
@@ -84,7 +156,7 @@ def _build_analysis_prompt(report_data: ReportData) -> str:
 - 姓名：{report_data.name}
 - 職級：{report_data.grade}
 - 管理目的：{report_data.purpose}
-- 繼續共事意願（他評平均）：{report_data.collaboration_average}/10
+{collab_info}
 
 ## 量化分數摘要
 {''.join(score_summary)}
@@ -95,9 +167,9 @@ def _build_analysis_prompt(report_data: ReportData) -> str:
 ## 分析要求
 {purpose_focus}
 
-請產出一段 **300-500 字**的客觀分析，內容需包含：
-1. **強項總結**：明確指出受評者在哪些面向/題目表現突出（以他評分數為依據）
-2. **盲點分析**：找出自評與他評落差最大的項目，分析可能原因
+請產出一段 **400-600 字**的客觀分析，內容需包含：
+1. **強項總結**：明確指出受評者在哪些面向/題目表現突出（以他評/主管/同儕/部屬分數為依據）
+2. **盲點分析**：{analysis_focus}
 3. **管理建議**：針對「{report_data.purpose}」的管理情境，提出具體、可落地的建議
 4. **發展優先序**：建議優先改善的 2-3 個面向
 

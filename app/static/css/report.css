@@ -16,6 +16,9 @@
     --report-border: #e8ecf1;
     --report-self-color: #e74c8b;
     --report-others-color: #2c3e8f;
+    --report-manager-color: #2c3e8f;
+    --report-peers-color: #00b894;
+    --report-subordinates-color: #e67e22;
     --report-page-width: 210mm;
     --report-page-height: 297mm;
 
@@ -465,6 +468,18 @@ body {
     background: var(--report-others-color);
 }
 
+.score-dot--manager {
+    background: var(--report-manager-color);
+}
+
+.score-dot--peers {
+    background: var(--report-peers-color);
+}
+
+.score-dot--subordinates {
+    background: var(--report-subordinates-color);
+}
+
 .score-label {
     color: var(--report-text-secondary);
 }
@@ -564,6 +579,52 @@ body {
     padding: 6px 12px;
     background: rgba(44, 62, 143, 0.03);
     border-left: 3px solid var(--report-others-color);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 6px;
+}
+
+/* L1 專用細分回饋樣式 */
+.feedback-manager-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feedback-manager-list li {
+    font-size: 0.85rem;
+    color: var(--report-text);
+    padding: 6px 12px;
+    background: rgba(44, 62, 143, 0.03);
+    border-left: 3px solid var(--report-manager-color);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 6px;
+}
+
+.feedback-peers-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feedback-peers-list li {
+    font-size: 0.85rem;
+    color: var(--report-text);
+    padding: 6px 12px;
+    background: rgba(0, 184, 148, 0.03);
+    border-left: 3px solid var(--report-peers-color);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 6px;
+}
+
+.feedback-subordinates-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feedback-subordinates-list li {
+    font-size: 0.85rem;
+    color: var(--report-text);
+    padding: 6px 12px;
+    background: rgba(230, 126, 34, 0.03);
+    border-left: 3px solid var(--report-subordinates-color);
     border-radius: 0 6px 6px 0;
     margin-bottom: 6px;
 }
