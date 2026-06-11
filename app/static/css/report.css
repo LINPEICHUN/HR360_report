@@ -333,6 +333,18 @@ body {
     background: var(--report-others-color);
 }
 
+.radar-legend-dot--manager {
+    background: var(--report-manager-color);
+}
+
+.radar-legend-dot--peers {
+    background: var(--report-peers-color);
+}
+
+.radar-legend-dot--subordinates {
+    background: var(--report-subordinates-color);
+}
+
 /* 評分量表 */
 .rating-scale-table {
     width: 100%;

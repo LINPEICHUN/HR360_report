@@ -1,5 +1,5 @@
 {
-  "api_provider": "gemini",
-  "api_key": "AIzaSyCxCrxZ0nPBkSCpMbQLP2hIs5dlONG2v0Y",
-  "model": "gemini-1.5-flash"
+  "api_provider": "davinci",
+  "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBSURFIiwic3ViIjoiZ2Fpc2YtcHJvamVjdCIsImF1ZCI6WyJBSURFIl0sImV4cCI6MTg5MzQyNzIwMCwiaWF0IjoxNzgwMDIxMjIyLCJqdGkiOiI0MGM0ZWE4Yy1jODhjLTRmZjgtOThhZC02ZDU1MDJlMmZhNTQiLCJhY2MiOiJMdWN5UEMuTGluIiwiZG9tIjoiZ2Fpc2YiLCJwcmlvcml0eSI6MX0.050P0s0h1X9pSAEmTIdHI2L2rWS5hXa0rQf3yI9d0wU",
+  "model": "gpt-4o-mini"
 }

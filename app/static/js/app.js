@@ -223,10 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const purposeNoteContent = document.getElementById('purposeNoteContent');
 
     const purposeNotes = {
-        'IDP 發展': '<strong>🎯 IDP 發展：</strong>著重分析「自評 vs 他評」落差，深挖「盲點（自評高他評低）」與「痛點（他評或主管評分最低項）」，以推導個人中長期發展計畫。',
-        '績效校準': '<strong>⚖️ 績效校準：</strong>著重比對「實際表現 vs 當前職級 KRA 期待」，明確列出尚未達標的現職行為，評估其現職符合度，作為考核依據。',
-        '晉升評估': '<strong>📈 晉升評估：</strong>著重比對「實際表現 vs 下一職級 KRA 期待」，客觀衡量晉升準備度，並精確標示出 Gap Area (能力差距項目)。',
-        '團隊文化': '<strong>👥 團隊文化：</strong>著重篩選與聚焦特定 Key Elements（第 3、6、8 題），剖析受評者的領導風格、團隊氛圍（心理安全感）與公司文化價值之傳遞。'
+        'IDP 發展': '<strong>🎯 IDP 發展：</strong>分析「自評與他評落差」，找出盲點與痛點，規劃個人發展計畫。',
+        '績效校準': '<strong>⚖️ 績效校準：</strong>比對「實際表現與現職 KRA 期待」，評估現職符合度與未達標行為。',
+        '晉升評估': '<strong>📈 晉升評估：</strong>比對「實際表現與下一職級 KRA 期待」，評估晉升準備度與能力差距。',
+        '團隊文化': '<strong>👥 團隊文化：</strong>聚焦共事行為與文化題（第 3、6、8 題），分析領導風格與團隊氛圍。'
     };
 
     if (purposeSelect && purposeNoteContent) {
