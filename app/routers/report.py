@@ -192,3 +192,23 @@ async def save_admin_config(
             "error": error
         },
     )
+
+
+@router.post("/api/admin/detect-models")
+async def detect_models_api(
+    request: Request,
+):
+    """即時探測可通訊的模型列表"""
+    from fastapi.responses import JSONResponse
+    from ..services.llm_analyzer import detect_available_models
+
+    try:
+        data = await request.json()
+        api_key = data.get("api_key", "")
+        api_provider = data.get("api_provider", "davinci")
+
+        models = await detect_available_models(api_key=api_key, provider=api_provider)
+        return JSONResponse(content={"status": "success", "models": models})
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+

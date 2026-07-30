@@ -104,10 +104,16 @@
 
                     <!-- 選擇模型 -->
                     <div class="form-group">
-                        <label class="form-label" for="model">使用的分析大模型 (Model)</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" for="model" style="margin-bottom: 0;">使用的分析大模型 (Model)</label>
+                            <button type="button" id="detectBtn" class="detect-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                <span>🔍 測試 API 鍵並檢測可用模型</span>
+                            </button>
+                        </div>
                         <select class="form-select" id="model" name="model" required>
                             <!-- 由 JS 動態填充 -->
                         </select>
+                        <div class="form-hint" id="detectStatus" style="margin-top: 6px; display: none;"></div>
                     </div>
                 </div>
 
@@ -125,10 +131,13 @@
             const providerSelect = document.getElementById("apiProvider");
             const modelSelect = document.getElementById("model");
             const providerHint = document.getElementById("providerHint");
+            const apiKeyInput = document.getElementById("apiKey");
+            const detectBtn = document.getElementById("detectBtn");
+            const detectStatus = document.getElementById("detectStatus");
             
             // 從後端讀取模型映射
-            const modelsData = {{ models_json | safe }};
-            const currentModel = "{{ config.model }}";
+            let modelsData = {{ models_json | safe }};
+            let currentModel = "{{ config.model }}";
             
             function updateModelsAndHints() {
                 const provider = providerSelect.value;
@@ -164,6 +173,63 @@
             // 初始化呼叫一次
             updateModelsAndHints();
             
+            // 自動檢測模型按鈕邏輯
+            if (detectBtn) {
+                detectBtn.addEventListener("click", async function() {
+                    const apiKey = apiKeyInput.value.trim();
+                    const provider = providerSelect.value;
+                    
+                    if (!apiKey) {
+                        detectStatus.style.display = "block";
+                        detectStatus.style.color = "#e53e3e";
+                        detectStatus.textContent = "⚠️ 請先填入 API 認證金鑰！";
+                        return;
+                    }
+                    
+                    // 進入 Loading 狀態
+                    detectBtn.disabled = true;
+                    detectBtn.style.opacity = "0.7";
+                    detectBtn.innerHTML = "<span>⏳ 正在測試連線與連線實測中...</span>";
+                    detectStatus.style.display = "block";
+                    detectStatus.style.color = "#4a5568";
+                    detectStatus.textContent = "正在發送連線測試請求，請稍候...";
+                    
+                    try {
+                        const response = await fetch("/api/admin/detect-models", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                api_key: apiKey,
+                                api_provider: provider
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok && result.status === "success") {
+                            // 更新模型資料清單
+                            modelsData[provider] = result.models;
+                            updateModelsAndHints();
+                            
+                            detectStatus.style.color = "#276749";
+                            detectStatus.textContent = `✅ 連線成功！已成功偵測並獲得 ${result.models.length} 個此金鑰可使用的模型。`;
+                        } else {
+                            detectStatus.style.color = "#c53030";
+                            detectStatus.textContent = `⚠️ 檢測失敗：${result.message || "無法取得模型資訊"}`;
+                        }
+                    } catch (err) {
+                        detectStatus.style.color = "#c53030";
+                        detectStatus.textContent = `⚠️ 網絡連線錯誤：${err.message}`;
+                    } finally {
+                        detectBtn.disabled = false;
+                        detectBtn.style.opacity = "1";
+                        detectBtn.innerHTML = "<span>🔍 測試 API 鍵並檢測可用模型</span>";
+                    }
+                });
+            }
+
             // 顯示隱藏 API Key
             const toggleBtn = document.getElementById("apiKeyToggle");
             const keyInput = document.getElementById("apiKey");
@@ -182,3 +248,4 @@
     </script>
 </body>
 </html>
+

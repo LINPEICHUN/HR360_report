@@ -419,3 +419,90 @@ async def run_llm_analysis(
         return result
     except Exception as e:
         return f"⚠️ LLM 分析失敗：{str(e)}\n\n請確認 API Key 是否正確，以及是否有足夠的配額。"
+
+
+ALL_DAVINCI_CANDIDATE_MODELS = [
+    {"value": "gpt-4o-mini", "label": "GPT-4o Mini (最推薦)"},
+    {"value": "gpt-4o", "label": "GPT-4o 旗艦模型"},
+    {"value": "gemini-3-flash", "label": "Gemini 3.0 Flash"},
+    {"value": "deepseek-r1-0528", "label": "DeepSeek R1 推理模型"},
+    {"value": "deepseek-v3-2", "label": "DeepSeek V3 旗艦模型"},
+    {"value": "gpt-o3-mini", "label": "GPT-o3 Mini 推理模型"},
+    {"value": "gpt-o3", "label": "GPT-o3 旗艦推理模型"},
+    {"value": "grok-4-1-fast-reasoning", "label": "Grok 4.1 快推理模型"},
+    {"value": "kimi-k2-thinking", "label": "Kimi K2 深度思考模型"},
+    {"value": "gpt-5-mini", "label": "GPT-5 Mini 輕量版"},
+    {"value": "gpt-5", "label": "GPT-5 搶先體驗"}
+]
+
+
+async def detect_available_models(api_key: str, provider: str = "davinci") -> list[dict]:
+    """
+    透過 API Key 即時測試與偵測目前真正可通訊呼叫的大模型清單。
+
+    Args:
+        api_key: API 認證金鑰
+        provider: "davinci" | "gemini" | "openai"
+
+    Returns:
+        可用模型清單 [{"value": "model_id", "label": "顯示名稱"}, ...]
+    """
+    import asyncio
+    import httpx
+    import urllib3
+
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    if not api_key or not api_key.strip():
+        raise Exception("請先輸入有效的 API 金鑰！")
+
+    if provider == "davinci":
+        endpoint = "https://moxaingress-gaisf-ingress.azurewebsites.net"
+        headers = {
+            "api-key": api_key.strip(),
+            "Content-Type": "application/json"
+        }
+
+        async def probe_model(candidate: dict, client: httpx.AsyncClient) -> tuple[dict, bool]:
+            model_id = candidate["value"]
+            api_version = DAVINCI_MODEL_VERSION_MAPPING.get(model_id, "2024-10-21")
+            url = f"{endpoint}/openai/deployments/{model_id}/chat/completions?api-version={api_version}"
+            payload = {
+                "messages": [{"role": "user", "content": "ping"}],
+                "max_tokens": 1
+            }
+            try:
+                # 設定短 timeout 以求快速回應
+                res = await client.post(url, headers=headers, json=payload, timeout=5.0)
+                # HTTP 200, 429 (quota issue but deployment exists), 400 (bad prompt but endpoint valid) 代表部署存在
+                if res.status_code in [200, 400, 429]:
+                    return candidate, True
+                return candidate, False
+            except Exception:
+                return candidate, False
+
+        async with httpx.AsyncClient(verify=False) as client:
+            tasks = [probe_model(item, client) for item in ALL_DAVINCI_CANDIDATE_MODELS]
+            results = await asyncio.gather(*tasks)
+
+        available = [item for item, is_ok in results if is_ok]
+        if not available:
+            raise Exception("探測完成，但未發現任何反應正常的達哥模型，請檢查 JWT 金鑰權限與網路。")
+        return available
+
+    elif provider == "gemini":
+        # Gemini 預設清單
+        return [
+            {"value": "gemini-1.5-flash", "label": "Gemini 1.5 Flash (預設)"},
+            {"value": "gemini-2.0-flash", "label": "Gemini 2.0 Flash"},
+            {"value": "gemini-2.5-flash", "label": "Gemini 2.5 Flash"},
+            {"value": "gemini-1.5-pro", "label": "Gemini 1.5 Pro"}
+        ]
+    elif provider == "openai":
+        return [
+            {"value": "gpt-4o-mini", "label": "GPT-4o Mini (預設)"},
+            {"value": "gpt-4o", "label": "GPT-4o"}
+        ]
+
+    return []
+
