@@ -40,3 +40,7 @@ admin_config.json
 app/static/test_report.html
 scratch/
 
+
+# Executables
+*.exe
+

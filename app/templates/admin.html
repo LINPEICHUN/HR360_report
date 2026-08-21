@@ -138,6 +138,8 @@
             // 從後端讀取模型映射
             let modelsData = {{ models_json | safe }};
             let currentModel = "{{ config.model }}";
+            const savedProvider = "{{ config.api_provider }}";
+            const savedKey = "{{ config.api_key }}";
             
             function updateModelsAndHints() {
                 const provider = providerSelect.value;
@@ -165,6 +167,13 @@
                 } else {
                     providerHint.textContent = "🔑 請填入標準 OpenAI API Key。";
                     providerHint.style.color = "#475569";
+                }
+                
+                // 3. 處理金鑰欄位的自動更新或清空
+                if (provider === savedProvider) {
+                    apiKeyInput.value = savedKey;
+                } else {
+                    apiKeyInput.value = "";
                 }
             }
             
