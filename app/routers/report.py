@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-from ..config import MANAGEMENT_PURPOSES, GRADES, API_PROVIDERS, RATING_SCALE
+from ..config import MANAGEMENT_PURPOSES, GRADES, API_PROVIDERS, RATING_SCALE, ADMIN_CONFIG_PATH
 
 # 各平台支援大模型清單
 MODELS = {
@@ -126,7 +126,7 @@ async def admin_page(request: Request):
         "api_key": "",
         "model": "gemini-1.5-flash"
     }
-    config_path = BASE_DIR / "admin_config.json"
+    config_path = ADMIN_CONFIG_PATH
     if config_path.exists():
         try:
             with open(config_path, "r", encoding="utf-8") as f:
@@ -165,7 +165,7 @@ async def save_admin_config(
         "api_key": api_key,
         "model": model
     }
-    config_path = BASE_DIR / "admin_config.json"
+    config_path = ADMIN_CONFIG_PATH
     try:
         with open(config_path, "w", encoding="utf-8") as f:
             json.dump(config, f, ensure_ascii=False, indent=2)

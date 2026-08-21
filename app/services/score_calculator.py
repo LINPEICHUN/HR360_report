@@ -69,7 +69,7 @@ def calculate_all_scores(
             peer_scores = []
             subordinate_scores = []
 
-            if grade == "L1" and not others_df.empty:
+            if not others_df.empty:
                 role_col = find_role_column(others_df)
                 manager_df = others_df[others_df[role_col].str.contains("主管", na=False)]
                 peers_df = others_df[others_df[role_col].str.contains("同儕|合作夥伴", na=False)]
@@ -129,7 +129,7 @@ def calculate_all_scores(
         dim_peer_avg = None
         dim_subordinate_avg = None
 
-        if grade == "L1":
+        if not others_df.empty:
             m_scores = [q.manager_score for q in questions if q.manager_score is not None]
             p_avgs = [q.peer_average for q in questions if q.peer_average is not None]
             s_avgs = [q.subordinate_average for q in questions if q.subordinate_average is not None]
@@ -211,7 +211,7 @@ def extract_qualitative_feedback(
         improve_peer = []
         improve_subordinate = []
 
-        if grade == "L1" and not others_df.empty:
+        if not others_df.empty:
             role_col = find_role_column(others_df)
             manager_df = others_df[others_df[role_col].str.contains("主管", na=False)]
             peers_df = others_df[others_df[role_col].str.contains("同儕|合作夥伴", na=False)]
@@ -314,7 +314,7 @@ def extract_other_feedback(
     random.shuffle(res["others"])
 
     # L1 細分
-    if grade == "L1":
+    if not others_df.empty:
         role_col = find_role_column(others_df)
         manager_df = others_df[others_df[role_col].str.contains("主管", na=False)]
         peers_df = others_df[others_df[role_col].str.contains("同儕|合作夥伴", na=False)]
@@ -390,7 +390,7 @@ def extract_collaboration_scores(
         res["others_avg"] = round(sum(res["others"]) / len(res["others"]), 2)
 
     # L1 細分
-    if grade == "L1":
+    if not others_df.empty:
         role_col = find_role_column(others_df)
         manager_df = others_df[others_df[role_col].str.contains("主管", na=False)]
         peers_df = others_df[others_df[role_col].str.contains("同儕|合作夥伴", na=False)]

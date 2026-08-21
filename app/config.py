@@ -237,3 +237,16 @@ API_PROVIDERS = [
     {"value": "gemini", "label": "Google Gemini"},
     {"value": "openai", "label": "OpenAI"},
 ]
+
+import sys
+from pathlib import Path
+
+def get_config_dir() -> Path:
+    """取得 admin_config.json 的讀寫路徑。若是 PyInstaller 打包環境，則定位到執行檔同級目錄下"""
+    if getattr(sys, 'frozen', False):
+        return Path(sys.executable).parent
+    return Path(__file__).resolve().parent.parent
+
+# 統一的 admin_config.json 路徑
+ADMIN_CONFIG_PATH = get_config_dir() / "admin_config.json"
+

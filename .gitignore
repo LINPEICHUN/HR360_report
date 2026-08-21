@@ -34,3 +34,9 @@ uploads/
 *.xlsx
 *.pdf
 *.csv
+
+# Local config and temp files
+admin_config.json
+app/static/test_report.html
+scratch/
+

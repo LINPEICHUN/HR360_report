@@ -6,6 +6,7 @@
 """
 from datetime import datetime
 from ..models.schemas import ReportData
+from ..config import ADMIN_CONFIG_PATH
 from .data_parser import parse_uploaded_file, split_by_role
 from .score_calculator import (
     calculate_all_scores,
@@ -96,8 +97,7 @@ async def generate_report(
     # 7.5. 如果 api_key 為空，嘗試載入全域管理員配置
     if not api_key or not api_key.strip():
         import json
-        from pathlib import Path
-        config_path = Path(__file__).resolve().parent.parent / "admin_config.json"
+        config_path = ADMIN_CONFIG_PATH
         if config_path.exists():
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
